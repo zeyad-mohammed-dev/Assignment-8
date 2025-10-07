@@ -3,7 +3,7 @@ import { connectDB } from "../db/connection.js";
 
 async function bootstrap() {
     try {
-        const port = 3000
+        const port = process.env.PORT || 3000
 
         await connectDB()
 
