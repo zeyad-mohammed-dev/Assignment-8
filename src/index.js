@@ -1,6 +1,4 @@
 import bootstrap from "./bootstrap/startApp.js";
-import dotenv from "dotenv"
-dotenv.config()
-
+import "dotenv/config"
 
 bootstrap()

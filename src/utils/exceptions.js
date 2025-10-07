@@ -9,3 +9,9 @@ export class NotValidEmail extends Error{
         super("❌ Not Valid Email" , {cause: 400})
     }
 }
+
+export class NotValidCredentials extends Error{
+    constructor(){
+        super("❌ Not Valid Credentials" , {cause : 400})
+    }
+}

@@ -6,9 +6,10 @@ Grade)
 • URL: POST /users/signup
  */
 
+import jwt from "jsonwebtoken"
 import { create, findOne } from "../../db/DBservices.js"
 import { userModel } from "../../db/models/user.model.js"
-import {  NotValidEmail } from "../../utils/exceptions.js"
+import {  NotFoundException, NotValidCredentials, NotValidEmail } from "../../utils/exceptions.js"
 import { successHandler } from "../../utils/successHandler.js"
 
 /**
@@ -29,3 +30,23 @@ export const signup =  async(req , res , next) => {
   
   return successHandler({res , status : 201 , msg  : "✅ Done " , data : user})
 }
+
+/**
+ * Create an API for authenticating users (Login)
+ *  and return a JSON Web Token (JWT) that contains the userId and will expire
+after “1 hour”. (Get the email and the password from the body).
+ (0.5 Grade) • URL: POST /users/login
+ */
+
+ export const login = async (req , res , next ) => {
+  const {email , password} = req.body
+  const user = await findOne({model : userModel , filter : {email}})
+  if (!user || password != user.password) {
+    return next(new NotValidCredentials)
+  }
+
+  const accessToken = jwt.sign({_id : user._id} , process.env.ACCESS_TOKEN , {expiresIn:"1Hr"} )
+  const refreshToken = jwt.sign({_id : user._id} , process.env.REFRESH_TOKEN , {expiresIn:"7D"})
+
+  return successHandler({res , status : 200 , data : {accessToken , refreshToken}})
+ }
