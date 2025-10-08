@@ -4,14 +4,20 @@ constructor(name = 'url'){
 }
 }
 
-export class NotValidEmail extends Error{
+export class NotValidEmailException extends Error{
     constructor(){
         super("❌ Not Valid Email" , {cause: 400})
     }
 }
 
-export class NotValidCredentials extends Error{
+export class NotValidCredentialsException extends Error{
     constructor(){
         super("❌ Not Valid Credentials" , {cause : 400})
+    }
+}
+
+export class NotValidTokenException extends Error{
+    constructor(){
+        super("❌ Not Valid Token ")
     }
 }
