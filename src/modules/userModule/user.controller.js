@@ -7,5 +7,6 @@ router.post('/signup' , userServices.signup )
 router.post('/login' , userServices.login)
 router.patch('/updateUser' , auth() , userServices.updateUser)
 router.delete('/deleteUser',auth(), userServices.deleteUser)
+router.get('/' , auth() , userServices.getUser)
 
 export default router

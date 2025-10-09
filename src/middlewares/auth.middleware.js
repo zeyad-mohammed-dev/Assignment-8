@@ -1,5 +1,3 @@
-//عايز اعمل ميدل وير بيتاخد من ال token ويشوف هل
-
 import { findById } from '../db/DBservices.js';
 import { userModel } from '../db/models/user.model.js';
 import { NotFoundException, NotValidTokenException } from '../utils/exceptions.js';
@@ -16,8 +14,8 @@ export const auth = () => {
     const user = await findById({ model: userModel, id });
 
     if (!user) {
-        return next(new NotFoundException("user"))
-    }   
+      return next(new NotFoundException('user'));
+    }
     req.user = user;
 
     next();
