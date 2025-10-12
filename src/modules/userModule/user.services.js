@@ -10,14 +10,14 @@ import { isExist } from '../../utils/helpers.js';
 export const signup = async (req, res, next) => {
   const { name, email, password, phone, age } = req.body;
   await isExist(userModel, { email });
-  const user = await create({ model: userModel, data: { name, email, password, phone: encryption(phone), age } });
+  const user = await create({ model: userModel, data: { name, email, password, phone, age } });
   return successHandler({ res, status: 201, data: user });
 };
 
 export const login = async (req, res, next) => {
   const { email, password } = req.body;
   const user = await findOne({ model: userModel, filter: { email } });
-  if (!user || password != user.password) {
+  if (!user || !user.checkPassword(password)) {
     return next(new NotValidCredentialsException());
   }
 
@@ -37,11 +37,6 @@ export const updateUser = async (req, res, next) => {
     await isExist(userModel, { email });
   }
 
-  let phone = updateData.phone;
-  if (phone) {
-    decryption(phone);
-  }
-
   const id = req.user._id;
 
   const updatedUser = await findByIdAndUpdate({
@@ -50,7 +45,7 @@ export const updateUser = async (req, res, next) => {
     data: {
       name: updateData.name,
       email: updateData.email,
-      phone,
+      phone: updateData.phone,
       age: updateData.age,
     },
   });
@@ -66,6 +61,5 @@ export const deleteUser = async (req, res, next) => {
 
 export const getUser = async (req, res, next) => {
   const user = req.user;
-  user.phone = decryption(user.phone);
   return successHandler({ res, data: user });
 };
