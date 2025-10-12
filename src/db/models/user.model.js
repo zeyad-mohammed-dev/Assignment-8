@@ -1,4 +1,5 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, set } from 'mongoose';
+import { hash } from '../../utils/bcrypt.js';
 
 const userSchema = new Schema({
   name: {
@@ -13,6 +14,9 @@ const userSchema = new Schema({
   password: {
     type: String,
     required: true,
+    set:function(value){
+      return hash(value)
+    }
   },
   phone: {
     type: String,
