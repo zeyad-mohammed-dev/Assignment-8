@@ -1,11 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { create, findById, findByIdAndDelete, findByIdAndUpdate, findOne } from '../../db/DBservices.js';
+import { create, findByIdAndDelete, findByIdAndUpdate, findOne } from '../../db/DBservices.js';
 import { userModel } from '../../db/models/user.model.js';
-import { NotFoundException, NotValidCredentialsException, NotValidEmailException, NotValidTokenException } from '../../utils/exceptions.js';
+import { NotValidCredentialsException } from '../../utils/exceptions.js';
 import { successHandler } from '../../utils/successHandler.js';
-import CryptoJS from 'crypto-js';
-import { decryption, encryption } from '../../utils/crypto.js';
-import { isExist } from '../../utils/helpers.js';
+import { isExist, isUserExist } from '../../utils/helpers.js';
 
 export const signup = async (req, res, next) => {
   const { name, email, password, phone, age } = req.body;
@@ -38,15 +36,16 @@ export const updateUser = async (req, res, next) => {
   }
 
   const id = req.user._id;
+  const user = await isUserExist(userModel, id);
 
   const updatedUser = await findByIdAndUpdate({
     model: userModel,
     id,
     data: {
-      name: updateData.name,
-      email: updateData.email,
-      phone: updateData.phone,
-      age: updateData.age,
+      name: updateData.name || user.name,
+      email: updateData.email || user.email,
+      phone: updateData.phone || user.phone,
+      age: updateData.age || user.age,
     },
   });
 
