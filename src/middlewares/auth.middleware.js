@@ -2,7 +2,7 @@ import { findById } from '../db/DBservices.js';
 import { userModel } from '../db/models/user.model.js';
 import { NotFoundException, NotValidTokenException } from '../utils/exceptions.js';
 import jwt from 'jsonwebtoken';
-import { isUserExist } from '../utils/helpers.js';
+import { isUserExist_byId } from '../utils/helpers.js';
 
 export const auth = () => {
   return async (req, res, next) => {
@@ -12,7 +12,7 @@ export const auth = () => {
     }
     const data = jwt.verify(token, process.env.ACCESS_TOKEN);
     const id = data._id;
-    const user = await isUserExist(userModel, id);
+    const user = await isUserExist_byId(userModel, id);
     req.user = user;
 
     next();

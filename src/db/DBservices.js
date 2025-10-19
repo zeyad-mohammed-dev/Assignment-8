@@ -8,6 +8,11 @@ export const findById = async ({ model, id }) => {
   return doc;
 };
 
+export const findByEmail = async (model, email) => {
+  const doc = await model.findOne({ email });
+  return doc;
+};
+
 export const find = async ({ model, filter = {} }) => {
   const docs = await model.find(filter);
   return docs;

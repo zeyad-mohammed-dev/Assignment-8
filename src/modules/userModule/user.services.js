@@ -3,7 +3,7 @@ import { create, findByIdAndDelete, findByIdAndUpdate, findOne } from '../../db/
 import { userModel } from '../../db/models/user.model.js';
 import { NotValidCredentialsException } from '../../utils/exceptions.js';
 import { successHandler } from '../../utils/successHandler.js';
-import { isExist, isUserExist } from '../../utils/helpers.js';
+import { isExist, isUserExist_byId } from '../../utils/helpers.js';
 
 export const signup = async (req, res, next) => {
   const { name, email, password, phone, age } = req.body;
@@ -36,7 +36,7 @@ export const updateUser = async (req, res, next) => {
   }
 
   const id = req.user._id;
-  const user = await isUserExist(userModel, id);
+  const user = await isUserExist_byId(userModel, id);
 
   const updatedUser = await findByIdAndUpdate({
     model: userModel,

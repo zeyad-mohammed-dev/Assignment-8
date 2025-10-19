@@ -1,28 +1,29 @@
-import express from "express";
-import userRouter from "./modules/userModule/user.controller.js";
-import { NotFoundException } from "./utils/exceptions.js";
+import express from 'express';
+import userRouter from './modules/userModule/user.controller.js';
+import { NotFoundException } from './utils/exceptions.js';
+import notesRouter from './modules/noteModule/note.controller.js';
 
-const app = express()
+const app = express();
 
 // parsing
-app.use(express.json())
+app.use(express.json());
 
 //router
-app.use('/user' , userRouter)
+app.use('/user', userRouter);
+app.use('/notes', notesRouter);
 
-//not found error handling 
-app.all('{/*s}',(req , res , next)=>{
-    return next(new NotFoundException)
-})
+//not found error handling
+app.all('{/*s}', (req, res, next) => {
+  return next(new NotFoundException());
+});
 
 //global errhandling
-app.use((err,req ,res , next)=>{
-    console.error(err.stack);
-    res.status(err.cause || 500).json({
-        msg : err.message || "❌ Internal Server Error" ,
-        status : err.cause || 500,
-    })
-})
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.cause || 500).json({
+    msg: err.message || '❌ Internal Server Error',
+    status: err.cause || 500,
+  });
+});
 
-
-export default app
+export default app;
