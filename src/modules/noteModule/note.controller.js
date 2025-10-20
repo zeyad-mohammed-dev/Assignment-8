@@ -7,4 +7,6 @@ router.post('/',auth(), noteService.addNote);
 
 router.patch('/:noteId',auth(), noteService.updateNote);
 
+router.put('/replace/:noteId' , auth() , noteService.replaceNote)
+
 export default router

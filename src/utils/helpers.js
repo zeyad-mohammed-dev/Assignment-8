@@ -9,6 +9,14 @@ export const isExist = async (usedModel, usedFilter) => {
   }
 };
 
+export const isNoteExist = async (modelName, filter) => {
+  const note = await findById({ model: modelName, id: filter });
+  if (!note) {
+    throw new NotFoundException('note');
+  }
+  return note;
+};
+
 export const isUserExist_byId = async (usedModel, id) => {
   const user = await findById({ model: usedModel, id });
   if (!user) {
