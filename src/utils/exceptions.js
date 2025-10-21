@@ -18,6 +18,19 @@ export class NotValidCredentialsException extends Error{
 
 export class NotValidTokenException extends Error{
     constructor(){
-        super("❌ Not Valid Token ")
+        super("❌ Not Valid Token ",{cause:403})
     }
 }
+
+export class NotValidUserIdException extends Error{
+    constructor(){
+        super('❌ invalid entered userId pleace try again !', { cause: 400 })
+    }
+}
+
+export class UnAuthorizedException extends Error{
+    constructor(){
+        super('❌ you are not the owner', { cause: 403 })
+    }
+}
+

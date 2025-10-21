@@ -1,7 +1,7 @@
 import { create, findById, findByIdAndUpdate } from '../../db/DBservices.js';
 import { noteModel } from '../../db/models/note.model.js';
 import { userModel } from '../../db/models/user.model.js';
-import { NotFoundException } from '../../utils/exceptions.js';
+import { NotFoundException, NotValidUserIdException, UnAuthorizedException } from '../../utils/exceptions.js';
 import { isNoteExist, isUserExist_byId } from '../../utils/helpers.js';
 import { successHandler } from '../../utils/successHandler.js';
 
@@ -16,7 +16,7 @@ headers) (0.5 Grade)
 export const addNote = async (req, res, next) => {
   const userId = req.user._id;
   const { title, content } = req.body;
-  const user = await isUserExist_byId(userModel, userId);
+  const user = await isUserExist_byId(userId);
 
   const note = await create({ model: noteModel, data: { title, content, userId } });
   return successHandler({ res, data: note });
@@ -35,10 +35,10 @@ export const updateNote = async (req, res, next) => {
   const { title, content } = req.body;
   const noteId = req.params.noteId;
 
-  const note = await isNoteExist(noteModel, noteId);
+  const note = await isNoteExist(noteId);
 
   if (userId.toString() !== note.userId.toString()) {
-    throw new Error('you are not the owner', { cause: 403 });
+    throw new UnAuthorizedException()
   }
 
   const updatedNote = await findByIdAndUpdate({ model: noteModel, id: noteId, data: { title, content } });
@@ -60,12 +60,12 @@ export const replaceNote = async (req, res, next) => {
   const { title, content, userId } = req.body;
 
   if (ownerId.toString() !== userId.toString()) {
-    throw new Error('invalid entered userId pleace try again !', { cause: 400 });
+    throw new NotValidUserIdException()
   }
 
-  const note = await isNoteExist(noteModel, noteId);
+  const note = await isNoteExist(noteId);
   if (ownerId.toString() !== note.userId.toString()) {
-    throw new Error('you are not the owner', { cause: 403 });
+    throw new UnAuthorizedException()
   }
 
   const newNote = await noteModel.findOneAndReplace(
@@ -82,3 +82,47 @@ export const replaceNote = async (req, res, next) => {
 
   return successHandler({ res, data: newNote });
 };
+
+/**
+ Updates the title of all notes created by a logged-in user.)
+  (Get the new Title from the body) 
+  (Get the id for the logged-in user (userId) from the token not the body) 
+(0.5 Grade) • URL: PATCH /notes/all 
+ */
+
+export const updateAll = async (req, res, next) => {
+  const ownerId = req.user.id;
+  const { title } = req.body;
+
+  const updatedNotes = await noteModel.updateMany({ userId: ownerId }, { title });
+  let message = 'No note found';
+  if (updatedNotes.modifiedCount > 0) {
+    message = 'All notes updated';
+  }
+
+  return successHandler({ res, msg: message });
+};
+
+
+/**
+ 5. Delete a single Note by its id and return the deleted note. 
+ (Only the owner of the note can make this operation)
+(Get the id for the logged-in user from the token not the body) (0.5 Grade)
+• URL: DELET /notes/:noteId => /notes/64d91c42d8979e1f30a12346 
+ */
+
+export const deleteNote = async (req , res ,next ) => {
+  const ownerId = req.user.id
+  const noteId = req.params.noteId
+
+  const note = await isNoteExist(noteId)
+
+  if (ownerId.toString() !== note.userId.toString()) {
+    throw new  UnAuthorizedException()
+  }
+
+  const deletedNote = await noteModel.deleteOne({_id :noteId})
+
+  return successHandler({res , data:deleteNote})
+
+}

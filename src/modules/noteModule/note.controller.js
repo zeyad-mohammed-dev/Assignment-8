@@ -5,8 +5,12 @@ const router = Router();
 
 router.post('/',auth(), noteService.addNote);
 
+router.patch('/all' , auth() , noteService.updateAll)
+
 router.patch('/:noteId',auth(), noteService.updateNote);
 
 router.put('/replace/:noteId' , auth() , noteService.replaceNote)
+
+router.delete('/:noteId' ,auth() , noteService.deleteNote)
 
 export default router

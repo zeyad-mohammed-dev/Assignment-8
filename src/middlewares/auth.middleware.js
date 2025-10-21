@@ -12,7 +12,7 @@ export const auth = () => {
     }
     const data = jwt.verify(token, process.env.ACCESS_TOKEN);
     const id = data._id;
-    const user = await isUserExist_byId(userModel, id);
+    const user = await isUserExist_byId(id);
     req.user = user;
 
     next();

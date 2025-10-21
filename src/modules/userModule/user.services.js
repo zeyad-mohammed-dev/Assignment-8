@@ -36,7 +36,7 @@ export const updateUser = async (req, res, next) => {
   }
 
   const id = req.user._id;
-  const user = await isUserExist_byId(userModel, id);
+  const user = await isUserExist_byId(id);
 
   const updatedUser = await findByIdAndUpdate({
     model: userModel,
