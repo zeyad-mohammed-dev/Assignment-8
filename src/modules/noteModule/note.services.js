@@ -125,7 +125,6 @@ export const deleteNote = async (req, res, next) => {
   return successHandler({ res, data: deletedNote });
 };
 
-
 /**
  6. Retrieve a paginated list of notes for the logged-in user,
   sorted by “createdAt” in descending order. 
@@ -135,21 +134,39 @@ export const deleteNote = async (req, res, next) => {
 • URL: GET /notes/paginate-sort => for example /notes/paginate-sort?page=2&limit=3 
  */
 
-export const getUserNotes = async (req , res , next ) => {
-  const page =req.query.page
-  const limit = req.query.limit
-  const skip = (page - 1 ) * limit 
+export const getUserNotes = async (req, res, next) => {
+  const page = req.query.page;
+  const limit = req.query.limit;
+  const skip = (page - 1) * limit;
+
+  const userId = req.user._id;
+
+  const notes = await noteModel.find({ userId }).sort({ createdAt: -1 }).skip(skip).limit(limit);
+
+  return successHandler({ res, data: notes });
+};
+
+/**
+ 7. Get a note by its id. 
+ (Only the owner of the note can make this operation)
+  (Get the id for the logged-in user (userId)
+from the token not the body) (0.5 Grade)
+• URL: GET /notes/:id => /posts/64a3baf1e567890124 
+
+ */
+
+export const getNoteById = async (req, res, next) => {
+  const ownerId = req.user._id;
+  const noteId = req.params.id;
+
+  const note = await isNoteExist(noteId);
+
+  if (ownerId.toString() !== note.userId.toString()) {
+    throw new UnAuthorizedException();
+  }
+
+  return successHandler({ res, data: note });
+};
 
 
-  const userId = req.user._id
 
-  const notes = await noteModel.find({ userId })
-  .sort({createdAt : -1})
-  .skip(skip)
-  .limit(limit)
-  
-
-
-
-return successHandler({res , data : notes})
-}
