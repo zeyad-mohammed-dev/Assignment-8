@@ -168,5 +168,23 @@ export const getNoteById = async (req, res, next) => {
   return successHandler({ res, data: note });
 };
 
+/**
+ 8. Get a note for logged-in user by its content. 
+ (Get the id for the logged-in user (userId) from the token not the body)
+(0.5 Grade)
+• URL:  => / notes/note-by-content?content=Workout Plan 
+ */
+
+export const getNoteByContent = async (req, res, next) => {
+  const content = req.query.content;
+  const userId = req.user._id;
+
+  const note = await noteModel.findOne({ content , userId });
+  if (!note) {
+    throw new NotFoundException('note');
+  }
+
+  return successHandler({ res, data: note });
+};
 
 

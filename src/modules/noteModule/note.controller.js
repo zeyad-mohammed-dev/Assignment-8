@@ -3,23 +3,20 @@ import * as noteService from './note.services.js';
 import { auth } from '../../middlewares/auth.middleware.js';
 const router = Router();
 
+router.post('/', auth(), noteService.addNote);
 
-router.post('/',auth(), noteService.addNote);
+router.patch('/all', auth(), noteService.updateAll);
 
-router.patch('/all' , auth() , noteService.updateAll)
+router.patch('/:noteId', auth(), noteService.updateNote);
 
-router.patch('/:noteId',auth(), noteService.updateNote);
+router.put('/replace/:noteId', auth(), noteService.replaceNote);
 
-router.put('/replace/:noteId' , auth() , noteService.replaceNote)
+router.delete('/:noteId', auth(), noteService.deleteNote);
 
-router.delete('/:noteId' ,auth() , noteService.deleteNote)
+router.get('/paginate-sort', auth(), noteService.getUserNotes);
 
-router.get('/paginate-sort' , auth() , noteService.getUserNotes)
+router.get('/note-by-content', auth(), noteService.getNoteByContent);
 
-router.get('/:id' , auth() , noteService.getNoteById)
+router.get('/:id', auth(), noteService.getNoteById);
 
-
-
-
-
-export default router
+export default router;
