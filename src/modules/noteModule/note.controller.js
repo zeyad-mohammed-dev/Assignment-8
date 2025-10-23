@@ -17,6 +17,8 @@ router.get('/paginate-sort', auth(), noteService.getUserNotes);
 
 router.get('/note-by-content', auth(), noteService.getNoteByContent);
 
+router.get('/note-with-user', auth(), noteService.getNotesWithUser);
+
 router.get('/:id', auth(), noteService.getNoteById);
 
 export default router;

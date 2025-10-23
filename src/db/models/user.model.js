@@ -37,6 +37,7 @@ const userSchema = new Schema(
     },
   },
   {
+    id: false,
     toJSON: {
       getters: true,
     },

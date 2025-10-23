@@ -179,7 +179,7 @@ export const getNoteByContent = async (req, res, next) => {
   const content = req.query.content;
   const userId = req.user._id;
 
-  const note = await noteModel.findOne({ content , userId });
+  const note = await noteModel.findOne({ content, userId });
   if (!note) {
     throw new NotFoundException('note');
   }
@@ -187,4 +187,19 @@ export const getNoteByContent = async (req, res, next) => {
   return successHandler({ res, data: note });
 };
 
+/**
+ 9. Retrieves all notes for the logged-in user with user information, 
+ selecting only the “title, userId and createdAt”
+from the note and the “email” from the user.
+ (Get the id for the logged-in user (userId) from the token not the body) (0.5 Grade)
+• URL: GET /notes/note-with-user
 
+ */
+
+export const getNotesWithUser = async (req, res, next) => {
+  const userId = req.user._id;
+
+  const notes = await noteModel.find({ userId }).select('title userId createdAt').populate('userId', 'email -_id');
+
+  return successHandler({ res, data: notes });
+};
