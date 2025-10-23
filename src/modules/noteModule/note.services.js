@@ -250,11 +250,20 @@ export const getAllNotesWithAggregate = async (req, res, next) => {
   return successHandler({ res, data: notes });
 };
 
-
-
 /**
  11. Delete all notes for the logged-in user. 
  (Get the id for the logged-in user (userId) from the token not the body) (0.5
 Grade)
 • URL: DELETE /notes
  */
+
+export const deleteAllNotes = async (req, res, next) => {
+  const userId = req.user._id;
+
+  const deletedNotes = await noteModel.deleteMany({ userId });
+  if (deletedNotes.deletedCount == 0) {
+    throw new Error('no notes found', { cause: 404 });
+  }
+
+  return successHandler({ res, msg: 'Deleted' });
+};
