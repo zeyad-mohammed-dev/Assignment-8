@@ -1,4 +1,4 @@
-import { create, findById, findByIdAndUpdate } from '../../db/DBservices.js';
+import { create, find, findById, findByIdAndDelete, findByIdAndUpdate } from '../../db/DBservices.js';
 import { noteModel } from '../../db/models/note.model.js';
 import { userModel } from '../../db/models/user.model.js';
 import { NotFoundException, NotValidUserIdException, UnAuthorizedException } from '../../utils/exceptions.js';
@@ -38,7 +38,7 @@ export const updateNote = async (req, res, next) => {
   const note = await isNoteExist(noteId);
 
   if (userId.toString() !== note.userId.toString()) {
-    throw new UnAuthorizedException()
+    throw new UnAuthorizedException();
   }
 
   const updatedNote = await findByIdAndUpdate({ model: noteModel, id: noteId, data: { title, content } });
@@ -60,12 +60,12 @@ export const replaceNote = async (req, res, next) => {
   const { title, content, userId } = req.body;
 
   if (ownerId.toString() !== userId.toString()) {
-    throw new NotValidUserIdException()
+    throw new NotValidUserIdException();
   }
 
   const note = await isNoteExist(noteId);
   if (ownerId.toString() !== note.userId.toString()) {
-    throw new UnAuthorizedException()
+    throw new UnAuthorizedException();
   }
 
   const newNote = await noteModel.findOneAndReplace(
@@ -103,7 +103,6 @@ export const updateAll = async (req, res, next) => {
   return successHandler({ res, msg: message });
 };
 
-
 /**
  5. Delete a single Note by its id and return the deleted note. 
  (Only the owner of the note can make this operation)
@@ -111,18 +110,46 @@ export const updateAll = async (req, res, next) => {
 • URL: DELET /notes/:noteId => /notes/64d91c42d8979e1f30a12346 
  */
 
-export const deleteNote = async (req , res ,next ) => {
-  const ownerId = req.user.id
-  const noteId = req.params.noteId
+export const deleteNote = async (req, res, next) => {
+  const ownerId = req.user.id;
+  const noteId = req.params.noteId;
 
-  const note = await isNoteExist(noteId)
+  const note = await isNoteExist(noteId);
 
   if (ownerId.toString() !== note.userId.toString()) {
-    throw new  UnAuthorizedException()
+    throw new UnAuthorizedException();
   }
 
-  const deletedNote = await noteModel.deleteOne({_id :noteId})
+  const deletedNote = await findByIdAndDelete({ model: noteModel, id: noteId });
 
-  return successHandler({res , data:deleteNote})
+  return successHandler({ res, data: deletedNote });
+};
 
+
+/**
+ 6. Retrieve a paginated list of notes for the logged-in user,
+  sorted by “createdAt” in descending order. 
+  (Get page and limit from query parameters) 
+  (Get the id for the logged-in user (userId) from the token not the body) 
+  (send the token in the headers) (0.5 Grade)
+• URL: GET /notes/paginate-sort => for example /notes/paginate-sort?page=2&limit=3 
+ */
+
+export const getUserNotes = async (req , res , next ) => {
+  const page =req.query.page
+  const limit = req.query.limit
+  const skip = (page - 1 ) * limit 
+
+
+  const userId = req.user._id
+
+  const notes = await noteModel.find({ userId })
+  .sort({createdAt : -1})
+  .skip(skip)
+  .limit(limit)
+  
+
+
+
+return successHandler({res , data : notes})
 }

@@ -13,4 +13,8 @@ router.put('/replace/:noteId' , auth() , noteService.replaceNote)
 
 router.delete('/:noteId' ,auth() , noteService.deleteNote)
 
+router.get('/paginate-sort' , auth() , noteService.getUserNotes)
+
+
+
 export default router
