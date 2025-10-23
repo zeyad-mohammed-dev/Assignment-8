@@ -203,3 +203,58 @@ export const getNotesWithUser = async (req, res, next) => {
 
   return successHandler({ res, data: notes });
 };
+
+/**
+ 10. Using aggregation,
+  retrieves all notes for the logged-in user with user information 
+  (name and email) and allow searching notes by the title. (1 Grade)
+• URL: GET /notes/aggregate => /notes/aggregate?title=Code Review Notes
+ */
+
+export const getAllNotesWithAggregate = async (req, res, next) => {
+  const userId = req.user._id;
+  const title = req.query.title;
+
+  if (title) {
+    const notes = await noteModel.aggregate([
+      { $match: { userId, title } },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userId',
+          foreignField: '_id',
+          as: 'user',
+        },
+      },
+      { $unwind: '$user' },
+      { $project: { title: 1, userId: 1, createdAt: 1, _id: 0, 'user.name': 1, 'user.email': 1 } },
+    ]);
+
+    return successHandler({ res, data: notes });
+  }
+
+  const notes = await noteModel.aggregate([
+    { $match: { userId } },
+    {
+      $lookup: {
+        from: 'users',
+        localField: 'userId',
+        foreignField: '_id',
+        as: 'user',
+      },
+    },
+    { $unwind: '$user' },
+    { $project: { title: 1, userId: 1, createdAt: 1, _id: 0, 'user.name': 1, 'user.email': 1 } },
+  ]);
+
+  return successHandler({ res, data: notes });
+};
+
+
+
+/**
+ 11. Delete all notes for the logged-in user. 
+ (Get the id for the logged-in user (userId) from the token not the body) (0.5
+Grade)
+• URL: DELETE /notes
+ */
